@@ -26,8 +26,6 @@ def get_imagem(url: str) -> str:
     return imagem.get("src")
 
 
-load_dotenv()
-
 COMUNICA_URL = "http://127.0.0.1:8000/api"
 
 RSS_URL = "https://admin.cnnbrasil.com.br/feed/"
@@ -43,6 +41,12 @@ CATEGORIAS = [
     'tecnologia', 'nacional'
 ]
 
+load_dotenv()
+token = requests.post(f"{COMUNICA_URL}/login/", json = {
+    "username": os.getenv("MATRICULA"),
+    "password": os.getenv("SENHA")
+}).json().get("Token")
+
 for entry in feed.entries:
     categoria = entry.link.split('/')[3]
     if categoria not in CATEGORIAS:
@@ -55,18 +59,16 @@ for entry in feed.entries:
         "body": entry.summary + '.',
         "link": entry.link,
         "data": str(
-            datetime.fromtimestamp(mktime(entry.published_parsed), tz = pytz.UTC)
+            datetime.fromtimestamp(
+                mktime(entry.published_parsed), 
+                tz = pytz.UTC
+            )
         ),
-        "imagem": get_imagem(entry.link)
+        "imagem_url": get_imagem(entry.link)
     }
 
-    token = requests.post(f"{COMUNICA_URL}/login/", json = {
-        "username": os.getenv("USERNAME"),
-        "password": os.getenv("PASSWORD")
-    }).json()
-    
     response = requests.post(f"{COMUNICA_URL}/news/post/", json = noticia, headers = {
-        "Authorization": f"Token {token.get("Token")}"
+        "Authorization": f"Token {token}"
     })
 
     print(response.status_code)
