@@ -6,6 +6,7 @@ from time import mktime
 
 def format_categoria(categoria: str) -> str:
     """Retorna a categoria com capitalização e acentuação."""
+    
     match categoria:
         case 'politica':
             return 'Política'
@@ -19,6 +20,7 @@ def format_categoria(categoria: str) -> str:
 
 def get_imagem(url: str) -> str:
     """Recebe uma notícia e retorna a URL para a imagem de capa da notícia."""
+    
     html = requests.get(url)
     soup = BeautifulSoup(html.text, 'html.parser')
 
@@ -68,7 +70,8 @@ for entry in feed.entries:
     }
 
     response = requests.post(f"{COMUNICA_URL}/news/post/", json = noticia, headers = {
-        "Authorization": f"Token {token}"
+        "Authorization": f"Bearer {token}"
     })
 
     print(response.status_code)
+
